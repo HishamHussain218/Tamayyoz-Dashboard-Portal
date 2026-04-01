@@ -20,7 +20,11 @@ import {
   ChevronRight,
   Shield,
   X,
-  Check
+  Check,
+  Settings,
+  Mail,
+  User,
+  BookOpen
 } from 'lucide-react-native';
 import { colors, fonts, radius, shadows, spacing } from '../../theme';
 import { Button } from '../ui/Button';
@@ -52,12 +56,10 @@ export const TeachersScreen: React.FC = () => {
   const { width: SCREEN_WIDTH } = useWindowDimensions();
   const [search, setSearch] = useState('');
   const [toast, setToast] = useState<string | null>(null);
-  
-  // FIXED: Corrected state initialization for Animated values
   const fadeAnim = useState(new Animated.Value(0))[0];
-  const profileSlideAnim = useState(new Animated.Value(SCREEN_WIDTH))[0];
   
-  const [inviteModalVisible, setInviteModalVisible] = useState(false);
+  const [teachers, setTeachers] = useState<Teacher[]>(mockTeachers);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
   const [viewTeacher, setViewTeacher] = useState<Teacher | null>(null);
   const [editTeacher, setEditTeacher] = useState<Teacher | null>(null);
   const [banTeacher, setBanTeacher] = useState<Teacher | null>(null);
@@ -74,13 +76,17 @@ export const TeachersScreen: React.FC = () => {
     ]).start(() => setToast(null));
   };
 
-  const openProfileView = (teacher: Teacher) => {
-    setViewTeacher(teacher);
-    Animated.timing(profileSlideAnim, { toValue: 0, duration: 300, useNativeDriver: false }).start();
+  const handleBlockTeacher = (id: string) => {
+    setTeachers(prev => prev.map(t => t.id === id 
+      ? { ...t, status: t.status === 'active' ? 'suspended' : 'active' } 
+      : t
+    ));
+    setBanTeacher(null);
+    showToast('تم تحديث حالة المعلم بنجاح');
   };
 
-  const closeProfileView = () => {
-    Animated.timing(profileSlideAnim, { toValue: SCREEN_WIDTH, duration: 250, useNativeDriver: false }).start(() => setViewTeacher(null));
+  const openProfileView = (teacher: Teacher) => {
+    setViewTeacher(teacher);
   };
 
   return (
@@ -95,11 +101,17 @@ export const TeachersScreen: React.FC = () => {
               <Text style={styles.title}>إدارة فريق العمل</Text>
               <Text style={styles.subtitle}>التحكم في بيانات المعلمين والعمولات</Text>
            </View>
-           <Button label="دعوة مدرس جديد" onPress={() => setInviteModalVisible(true)} variant="primary" icon={<Plus size={18} color={colors.secondary} />} />
+           <Button 
+              label="إضافة معلم جديد" 
+              onPress={() => setCreateModalVisible(true)} 
+              variant="primary" 
+              icon={<Plus size={18} color={colors.secondary} />} 
+           />
         </View>
 
         <View style={styles.toolbar}>
            <View style={styles.searchWrap}>
+              <Search style={{position: 'absolute', right: 12, top: 12, zIndex: 1}} size={20} color={colors.textMuted} />
               <SearchBar value={search} onChangeText={setSearch} placeholder="ابحث عن معلم..." />
            </View>
            <Pressable style={styles.filterBtn} onPress={() => setFilterVisible(!filterVisible)}>
@@ -127,82 +139,160 @@ export const TeachersScreen: React.FC = () => {
         </View>
 
         <FlatList
-          data={mockTeachers.filter(t => t.name.includes(search))}
+          data={teachers.filter(t => t.name.includes(search))}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <View style={styles.row}>
+            <View style={[styles.row, item.status === 'suspended' && { opacity: 0.6 }]}>
                <View style={[styles.cell, { flex: 2, flexDirection: 'row-reverse', alignItems: 'center' }]}>
                   <Image source={{ uri: item.avatar }} style={styles.avatar} />
                   <View style={{ marginRight: 12, alignItems: 'flex-end' }}>
-                     <Text style={styles.nameText}>{item.name}</Text>
+                     <View style={{ flexDirection: 'row-reverse', alignItems: 'center' }}>
+                        <Text style={styles.nameText}>{item.name}</Text>
+                        {item.status === 'suspended' && (
+                           <View style={[styles.statusDot, { backgroundColor: colors.error, marginRight: 6 }]} />
+                        )}
+                     </View>
                      <Text style={styles.emailText}>{item.email}</Text>
                   </View>
                </View>
                <View style={styles.cell}><Text style={styles.valText}>{item.courses}</Text></View>
-               <View style={styles.cell}><Text style={styles.valText}>{item.sales}</Text></View>
+               <View style={styles.cell}><Text style={styles.valText}>{item.sales} <Text style={{fontSize: 10, color: colors.textMuted}}>ر.س</Text></Text></View>
                <View style={[styles.cell, { flexDirection: 'row-reverse', justifyContent: 'center' }]}>
-                  <Pressable onPress={() => openProfileView(item)} style={styles.iconButton}><Eye size={18} color={colors.textSecondary} /></Pressable>
-                  <Pressable onPress={() => setEditTeacher(item)} style={[styles.iconButton, { marginHorizontal: 8 }]}><View style={styles.dot} /></Pressable>
-                  <Pressable onPress={() => setBanTeacher(item)} style={styles.iconButton}><Shield size={16} color={colors.error} /></Pressable>
+                  <Pressable onPress={() => openProfileView(item)} style={styles.iconButton}>
+                    <Eye size={18} color={colors.textSecondary} />
+                  </Pressable>
+                  <Pressable onPress={() => setEditTeacher(item)} style={[styles.iconButton, { marginHorizontal: 8 }]}>
+                    <Settings size={18} color={colors.textSecondary} />
+                  </Pressable>
+                  <Pressable onPress={() => setBanTeacher(item)} style={styles.iconButton}>
+                    <Shield size={16} color={item.status === 'suspended' ? colors.textMuted : colors.error} />
+                  </Pressable>
                </View>
             </View>
           )}
         />
       </View>
 
-      {/* Invite Modal */}
-      <Modal visible={inviteModalVisible} onClose={() => setInviteModalVisible(false)} title="دعوة معلم">
-         <View style={styles.modalBody}>
+      {/* Create Teacher Modal */}
+      <Modal visible={createModalVisible} onClose={() => setCreateModalVisible(false)} title="إضافة معلم جديد">
+         <ScrollView style={styles.modalBody}>
+            <Text style={styles.label}>الاسم بالكامل</Text>
+            <View style={styles.inputBox}>
+               <User size={18} color={colors.textMuted} />
+               <TextInput style={styles.input} placeholder="أدخل اسم المعلم" />
+            </View>
+
             <Text style={styles.label}>البريد الإلكتروني</Text>
-            <View style={styles.inputBox}><TextInput style={styles.input} placeholder="teacher@email.com" /></View>
-            <Button label="إرسال الدعوة" variant="primary" style={{ marginTop: 10 }} onPress={() => { setInviteModalVisible(false); showToast('تم الإرسال'); }} />
-         </View>
+            <View style={styles.inputBox}>
+               <Mail size={18} color={colors.textMuted} />
+               <TextInput style={styles.input} placeholder="teacher@email.com" keyboardType="email-address" />
+            </View>
+
+            <Text style={styles.label}>التخصص</Text>
+            <View style={styles.inputBox}>
+               <BookOpen size={18} color={colors.textMuted} />
+               <TextInput style={styles.input} placeholder="مثال: فيزياء، كيمياء" />
+            </View>
+
+            <Text style={styles.label}>نسبة العمولة (%)</Text>
+            <View style={styles.inputBox}>
+               <Settings size={18} color={colors.textMuted} />
+               <TextInput style={styles.input} placeholder="25" keyboardType="numeric" />
+            </View>
+
+            <Button 
+               label="حفظ وإضافة" 
+               variant="primary" 
+               style={{ marginTop: 10, marginBottom: 20 }} 
+               onPress={() => { setCreateModalVisible(false); showToast('تمت الإضافة بنجاح'); }} 
+            />
+         </ScrollView>
       </Modal>
 
       {/* Edit Modal */}
       <Modal visible={!!editTeacher} onClose={() => setEditTeacher(null)} title="تعديل العمولة">
          <View style={styles.modalBody}>
             <Text style={styles.label}>نسبة العمولة (%)</Text>
-            <View style={styles.inputBox}><TextInput style={styles.input} defaultValue="25" keyboardType="numeric" /></View>
+            <View style={styles.inputBox}>
+               <Settings size={18} color={colors.textMuted} />
+               <TextInput style={styles.input} defaultValue={editTeacher?.commission.replace('%', '')} keyboardType="numeric" />
+            </View>
             <Button label="حفظ التعديلات" variant="primary" style={{ marginTop: 10 }} onPress={() => { setEditTeacher(null); showToast('تم الحفظ'); }} />
          </View>
       </Modal>
 
       {/* Ban Confirmation */}
-      <Modal visible={!!banTeacher} onClose={() => setBanTeacher(null)} title="تأكيد الإيقاف">
+      <Modal visible={!!banTeacher} onClose={() => setBanTeacher(null)} title={banTeacher?.status === 'suspended' ? 'إلغاء الإيقاف' : 'تأكيد الإيقاف'}>
          <View style={styles.modalBody}>
-            <Text style={styles.warningText}>هل أنت متأكد من إيقاف حساب المدرس؟</Text>
+            <Text style={styles.warningText}>
+               {banTeacher?.status === 'suspended' 
+                  ? 'هل أنت متأكد من إعادة تفعيل حساب المدرس؟'
+                  : 'هل أنت متأكد من إيقاف حساب المدرس؟ هذا سيمنعه من الوصول للوحة التحكم.'}
+            </Text>
             <View style={{ flexDirection: 'row-reverse', marginTop: 20 }}>
-               <Button label="نعم" variant="destructive" style={{ flex: 1, marginLeft: 10 }} onPress={() => { setBanTeacher(null); showToast('تم الإيقاف'); }} />
+               <Button 
+                  label={banTeacher?.status === 'suspended' ? "تفعيل الحساب" : "نعم، إيقاف"} 
+                  variant={banTeacher?.status === 'suspended' ? "primary" : "destructive"} 
+                  style={{ flex: 1, marginLeft: 10 }} 
+                  onPress={() => handleBlockTeacher(banTeacher!.id)} 
+               />
                <Button label="تراجع" variant="secondary" style={{ flex: 1 }} onPress={() => setBanTeacher(null)} />
             </View>
          </View>
       </Modal>
 
-      {/* Profile Slide-over */}
-      {viewTeacher && (
-        <Animated.View style={[styles.profileSide, { transform: [{ translateX: profileSlideAnim }] }]}>
-          <View style={[styles.sideContent, { width: Math.min(480, SCREEN_WIDTH * 0.75) }]}>
-             <View style={styles.sideHeader}>
-                <Pressable onPress={closeProfileView}><ChevronRight size={24} color={colors.secondary} /></Pressable>
-                <Text style={styles.sideTitle}>ملف المدرس</Text>
-                <Check size={20} color={colors.success} />
-             </View>
-             <ScrollView contentContainerStyle={{ padding: 20 }}>
-                <View style={styles.sideUser}>
-                   <Image source={{ uri: viewTeacher.avatar }} style={styles.sideAvatar} />
-                   <Text style={styles.sideName}>{viewTeacher.name}</Text>
-                   <Text style={styles.sideEmail}>{viewTeacher.email}</Text>
-                </View>
-                <View style={styles.sideTabs}>
-                   <Pressable onPress={() => setActiveTab('courses')} style={[styles.sideTab, activeTab === 'courses' && styles.sideTabActive]}><Text style={styles.sideTabText}>النشاط</Text></Pressable>
-                   <Pressable onPress={() => setActiveTab('finance')} style={[styles.sideTab, activeTab === 'finance' && styles.sideTabActive]}><Text style={styles.sideTabText}>المالية</Text></Pressable>
-                </View>
-                {activeTab === 'courses' ? <Badge label="كورس نشط" variant="success" /> : <Text style={{textAlign: 'center'}}>12,400 ر.س</Text>}
-             </ScrollView>
-          </View>
-        </Animated.View>
-      )}
+      {/* Teacher Profile Modal */}
+      <Modal visible={!!viewTeacher} onClose={() => setViewTeacher(null)} title="ملف المدرس">
+         {viewTeacher && (
+            <View style={styles.profileModalBody}>
+               <View style={styles.sideUser}>
+                  <Image source={{ uri: viewTeacher.avatar }} style={styles.sideAvatar} />
+                  <Text style={styles.sideName}>{viewTeacher.name}</Text>
+                  <Text style={styles.sideEmail}>{viewTeacher.email}</Text>
+                  <View style={{marginTop: 8}}>
+                     <Badge label={viewTeacher.status === 'active' ? 'حساب نشط' : 'حساب موقف'} variant={viewTeacher.status === 'active' ? 'success' : 'error'} />
+                  </View>
+               </View>
+
+               <View style={[styles.sideTabs, { marginHorizontal: 0 }]}>
+                  <Pressable onPress={() => setActiveTab('courses')} style={[styles.sideTab, activeTab === 'courses' && styles.sideTabActive]}>
+                     <Text style={[styles.sideTabText, { color: activeTab === 'courses' ? colors.secondary : colors.textMuted }]}>النشاط والكورسات</Text>
+                  </Pressable>
+                  <Pressable onPress={() => setActiveTab('finance')} style={[styles.sideTab, activeTab === 'finance' && styles.sideTabActive]}>
+                     <Text style={[styles.sideTabText, { color: activeTab === 'finance' ? colors.secondary : colors.textMuted }]}>العمولات والأرباح</Text>
+                  </Pressable>
+               </View>
+
+               <View style={styles.tabContent}>
+                  {activeTab === 'courses' ? (
+                     <View style={styles.statsCard}>
+                        <View style={styles.statItem}>
+                           <Text style={styles.statLabel}>إجمالي الكورسات</Text>
+                           <Text style={styles.statVal}>{viewTeacher.courses}</Text>
+                        </View>
+                        <View style={[styles.statItem, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+                           <Text style={styles.statLabel}>التخصص</Text>
+                           <Text style={styles.statVal}>{viewTeacher.specialty}</Text>
+                        </View>
+                     </View>
+                  ) : (
+                     <View style={styles.statsCard}>
+                        <View style={styles.statItem}>
+                           <Text style={styles.statLabel}>إجمالي المبيعات</Text>
+                           <Text style={styles.statVal}>{viewTeacher.sales} ر.س</Text>
+                        </View>
+                        <View style={[styles.statItem, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+                           <Text style={styles.statLabel}>العمولة الراهنة</Text>
+                           <Text style={styles.statVal}>{viewTeacher.commission}</Text>
+                        </View>
+                     </View>
+                  )}
+               </View>
+
+               <Button label="إغلاق" variant="secondary" onPress={() => setViewTeacher(null)} style={{marginTop: 24, borderRadius: radius.md}} />
+            </View>
+         )}
+      </Modal>
 
       {/* Toast Notification */}
       {toast && (
@@ -260,5 +350,11 @@ const styles = StyleSheet.create({
   sideTabText: { fontFamily: fonts.bold, fontSize: 12 },
   toast: { position: 'absolute', bottom: 30, left: 30, backgroundColor: '#F0FDF4', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#10B981', flexDirection: 'row-reverse', alignItems: 'center', zIndex: 2000, ...shadows.md },
   toastText: { color: '#166534', fontFamily: fonts.bold, fontSize: 13, marginRight: 10 },
-  dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.textMuted },
+  statusDot: { width: 8, height: 8, borderRadius: 4, marginLeft: 6 },
+  profileModalBody: { paddingBottom: 10 },
+  tabContent: { marginTop: 10 },
+  statsCard: { flexDirection: 'row-reverse', backgroundColor: '#F8F9FA', borderRadius: 16, padding: 15, borderWidth: 1, borderColor: colors.border },
+  statItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  statLabel: { fontFamily: fonts.regular, fontSize: 11, color: colors.textMuted, marginBottom: 4 },
+  statVal: { fontFamily: fonts.tajawalBold, fontSize: 16, color: colors.secondary },
 });
