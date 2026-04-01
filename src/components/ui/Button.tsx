@@ -56,7 +56,7 @@ export const Button: React.FC<ButtonProps> = ({
           opacity: pressed ? 0.7 : 1,
         } as ViewStyle,
         Platform.select({
-          web: { cursor: isDisabled ? 'default' : 'pointer' },
+          web: { cursor: isDisabled ? 'default' : 'pointer' } as any,
           default: {},
         }),
         style,

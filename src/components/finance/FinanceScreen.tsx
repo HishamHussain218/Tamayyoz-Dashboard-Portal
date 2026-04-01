@@ -131,14 +131,16 @@ const styles = StyleSheet.create({
     gap: 16,
     marginBottom: spacing.xxl,
   },
-  balanceBox: {
-    flex: 1.5,
-    backgroundColor: colors.primary,
+  statBox: {
     borderRadius: radius.xl,
     padding: 24,
     borderWidth: 1.2,
-    borderColor: colors.secondary,
     ...shadows.md,
+  },
+  balanceBox: {
+    flex: 1.5,
+    backgroundColor: colors.primary,
+    borderColor: colors.secondary,
     alignItems: 'flex-end',
   },
   balanceLabel: {

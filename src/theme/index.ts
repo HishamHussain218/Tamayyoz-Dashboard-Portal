@@ -14,6 +14,7 @@ export const colors = {
   warning: '#F59E0B',
   warningLight: '#FFFBEB',
   error: '#EF4444',
+  errorLight: '#FEF2F2',
   info: '#3B82F6',
   infoLight: '#EFF6FF',
 };

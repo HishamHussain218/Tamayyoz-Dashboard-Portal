@@ -231,6 +231,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: radius.md,
   },
+  actionBtn: {
+    // This is used alongside viewBtn, any specific styles for general action buttons can go here
+  },
   viewBtnText: {
     fontFamily: fonts.bold,
     fontSize: 13,
