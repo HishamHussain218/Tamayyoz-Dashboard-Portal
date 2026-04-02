@@ -18,6 +18,7 @@ import {
   Plus, 
   Eye, 
   ChevronRight,
+  ChevronDown,
   Shield,
   X,
   Check,
@@ -66,6 +67,14 @@ export const TeachersScreen: React.FC = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   
   const [activeTab, setActiveTab] = useState<'courses' | 'finance'>('courses');
+  const [newCommission, setNewCommission] = useState('');
+  const [autoPublish, setAutoPublish] = useState(false);
+
+  const openEditModal = (teacher: Teacher) => {
+     setEditTeacher(teacher);
+     setNewCommission(teacher.commission.replace('%', ''));
+     setAutoPublish(false);
+  };
 
   const showToast = (message: string) => {
     setToast(message);
@@ -88,6 +97,15 @@ export const TeachersScreen: React.FC = () => {
   const openProfileView = (teacher: Teacher) => {
     setViewTeacher(teacher);
   };
+
+  let parsedSales = 0;
+  let parsedComm = 0;
+  if (viewTeacher) {
+    parsedSales = parseFloat(viewTeacher.sales.replace(/,/g, '')) || 0;
+    parsedComm = parseFloat(viewTeacher.commission.replace('%', '')) || 0;
+  }
+  const centerCut = parsedSales * (parsedComm / 100);
+  const teacherCut = parsedSales - centerCut;
 
   return (
     <View style={styles.container}>
@@ -135,6 +153,7 @@ export const TeachersScreen: React.FC = () => {
            <Text style={[styles.hCell, { flex: 2 }]}>المعلم</Text>
            <Text style={styles.hCell}>الكورسات</Text>
            <Text style={styles.hCell}>المبيعات</Text>
+           <Text style={styles.hCell}>العمولة</Text>
            <Text style={styles.hCell}>الإجراءات</Text>
         </View>
 
@@ -156,12 +175,13 @@ export const TeachersScreen: React.FC = () => {
                   </View>
                </View>
                <View style={styles.cell}><Text style={styles.valText}>{item.courses}</Text></View>
-               <View style={styles.cell}><Text style={styles.valText}>{item.sales} <Text style={{fontSize: 10, color: colors.textMuted}}>ر.س</Text></Text></View>
+               <View style={styles.cell}><Text style={styles.valText}>{item.sales} <Text style={{fontSize: 10, color: colors.textMuted}}>ج.م</Text></Text></View>
+               <View style={styles.cell}><Text style={styles.valText}>{item.commission}</Text></View>
                <View style={[styles.cell, { flexDirection: 'row-reverse', justifyContent: 'center' }]}>
                   <Pressable onPress={() => openProfileView(item)} style={styles.iconButton}>
                     <Eye size={18} color={colors.textSecondary} />
                   </Pressable>
-                  <Pressable onPress={() => setEditTeacher(item)} style={[styles.iconButton, { marginHorizontal: 8 }]}>
+                  <Pressable onPress={() => openEditModal(item)} style={[styles.iconButton, { marginHorizontal: 8 }]}>
                     <Settings size={18} color={colors.textSecondary} />
                   </Pressable>
                   <Pressable onPress={() => setBanTeacher(item)} style={styles.iconButton}>
@@ -173,51 +193,127 @@ export const TeachersScreen: React.FC = () => {
         />
       </View>
 
-      {/* Create Teacher Modal */}
-      <Modal visible={createModalVisible} onClose={() => setCreateModalVisible(false)} title="إضافة معلم جديد">
-         <ScrollView style={styles.modalBody}>
-            <Text style={styles.label}>الاسم بالكامل</Text>
-            <View style={styles.inputBox}>
-               <User size={18} color={colors.textMuted} />
-               <TextInput style={styles.input} placeholder="أدخل اسم المعلم" />
+      {/* Institutional Teacher Invitation Modal */}
+      <Modal visible={createModalVisible} onClose={() => setCreateModalVisible(false)} title="دعوة معلم للانضمام للمؤسسة">
+         <ScrollView style={[styles.modalBody, { paddingHorizontal: 32, paddingVertical: 10 }]} showsVerticalScrollIndicator={false}>
+            {/* Contextual Logic / Header */}
+            <Text style={{ fontFamily: fonts.regular, fontSize: 13, color: colors.textSecondary, textAlign: 'center', marginBottom: 24, lineHeight: 22 }}>
+               سيتم إرسال رابط تفعيل رسمي لبريد المعلم لإتمام إعداد حسابه الشخصي.
+            </Text>
+
+            {/* Smart Fields */}
+            <Text style={[styles.label, { fontSize: 14, fontFamily: fonts.bold }]}>البريد الإلكتروني للمعلم</Text>
+            <View style={[styles.inputBox, { borderWidth: 2, borderColor: colors.secondary, backgroundColor: '#FFF', height: 50, paddingHorizontal: 12 }]}>
+               <Mail size={18} color={colors.secondary} />
+               <TextInput style={[styles.input, { fontFamily: fonts.bold }]} placeholder="teacher@email.com" keyboardType="email-address" />
             </View>
 
-            <Text style={styles.label}>البريد الإلكتروني</Text>
-            <View style={styles.inputBox}>
-               <Mail size={18} color={colors.textMuted} />
-               <TextInput style={styles.input} placeholder="teacher@email.com" keyboardType="email-address" />
+            <Text style={[styles.label, { fontSize: 14, fontFamily: fonts.bold }]}>التخصص (القسم العلمي)</Text>
+            <Pressable style={[styles.inputBox, { borderWidth: 2, borderColor: colors.secondary, backgroundColor: '#FFF', height: 50, paddingHorizontal: 12, justifyContent: 'space-between' }]}>
+               <View style={{flexDirection: 'row-reverse', alignItems: 'center'}}>
+                  <BookOpen size={18} color={colors.secondary} style={{marginLeft: 8}} />
+                  <Text style={[styles.input, { fontFamily: fonts.bold, color: colors.textMuted }]}>اختر القسم (مثال: اللغات)</Text>
+               </View>
+               <ChevronDown size={18} color={colors.secondary} />
+            </Pressable>
+
+            <Text style={[styles.label, { fontSize: 14, fontFamily: fonts.bold }]}>نسبة العمولة (%)</Text>
+            <View style={[styles.inputBox, { borderWidth: 2, borderColor: colors.secondary, backgroundColor: '#FFF', height: 50, paddingHorizontal: 12, marginBottom: 8 }]}>
+               <Settings size={18} color={colors.secondary} />
+               <TextInput style={[styles.input, { fontFamily: fonts.bold }]} placeholder="25" keyboardType="numeric" />
+            </View>
+            <Text style={{ fontFamily: fonts.regular, fontSize: 11, color: colors.textMuted, textAlign: 'right', marginTop: -4, marginBottom: 20 }}>
+               نسبة استقطاع المؤسسة من مبيعات المعلم.
+            </Text>
+
+            {/* Management Permissions */}
+            <Text style={[styles.label, { fontSize: 14, fontFamily: fonts.bold }]}>صلاحيات النشر والرقابة</Text>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F9F9F9', padding: 16, borderRadius: 12, borderWidth: 2, borderColor: colors.border, marginBottom: 32 }}>
+               <Text style={{ fontFamily: fonts.bold, fontSize: 14, color: colors.secondary }}>تفعيل النشر التلقائي للمحتوى</Text>
+               <Pressable 
+                  onPress={() => setAutoPublish(!autoPublish)} 
+                  style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: autoPublish ? colors.primary : '#E5E7EB', borderWidth: 2, borderColor: colors.secondary, justifyContent: 'center', paddingHorizontal: 2 }}
+               >
+                  <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: autoPublish ? colors.secondary : '#FFF', borderWidth: autoPublish ? 0 : 2, borderColor: colors.secondary, alignSelf: autoPublish ? 'flex-start' : 'flex-end' }} />
+               </Pressable>
             </View>
 
-            <Text style={styles.label}>التخصص</Text>
-            <View style={styles.inputBox}>
-               <BookOpen size={18} color={colors.textMuted} />
-               <TextInput style={styles.input} placeholder="مثال: فيزياء، كيمياء" />
+            {/* Action Buttons */}
+            <View style={{ flexDirection: 'row-reverse', gap: 16, paddingBottom: 20 }}>
+               <Button 
+                  label="إرسال دعوة الانضمام" 
+                  variant="primary" 
+                  style={{ flex: 2, height: 50, borderRadius: 24, borderWidth: 2, borderColor: colors.secondary, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 0, elevation: 4 }} 
+                  onPress={() => { setCreateModalVisible(false); showToast('تم إرسال الدعوة بنجاح'); }} 
+               />
+               <Button 
+                  label="إلغاء" 
+                  variant="secondary" 
+                  style={{ flex: 1, height: 50, borderRadius: 24, borderWidth: 2, borderColor: colors.secondary }} 
+                  onPress={() => setCreateModalVisible(false)} 
+               />
             </View>
-
-            <Text style={styles.label}>نسبة العمولة (%)</Text>
-            <View style={styles.inputBox}>
-               <Settings size={18} color={colors.textMuted} />
-               <TextInput style={styles.input} placeholder="25" keyboardType="numeric" />
-            </View>
-
-            <Button 
-               label="حفظ وإضافة" 
-               variant="primary" 
-               style={{ marginTop: 10, marginBottom: 20 }} 
-               onPress={() => { setCreateModalVisible(false); showToast('تمت الإضافة بنجاح'); }} 
-            />
          </ScrollView>
       </Modal>
 
       {/* Edit Modal */}
-      <Modal visible={!!editTeacher} onClose={() => setEditTeacher(null)} title="تعديل العمولة">
-         <View style={styles.modalBody}>
-            <Text style={styles.label}>نسبة العمولة (%)</Text>
-            <View style={styles.inputBox}>
-               <Settings size={18} color={colors.textMuted} />
-               <TextInput style={styles.input} defaultValue={editTeacher?.commission.replace('%', '')} keyboardType="numeric" />
+      <Modal visible={!!editTeacher} onClose={() => setEditTeacher(null)} title="">
+         <View style={[styles.modalBody, { paddingBottom: 10 }]}>
+            {/* Contextual Header */}
+            <View style={{flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 24, paddingBottom: 16, borderBottomWidth: 2, borderBottomColor: colors.borderLight}}>
+               <Image source={{uri: editTeacher?.avatar}} style={{width: 40, height: 40, borderRadius: 20, marginLeft: 12, borderWidth: 2, borderColor: colors.secondary}} />
+               <Text style={{fontFamily: fonts.tajawalBold, fontSize: 18, color: colors.secondary}}>إعدادات {editTeacher?.name}</Text>
             </View>
-            <Button label="حفظ التعديلات" variant="primary" style={{ marginTop: 10 }} onPress={() => { setEditTeacher(null); showToast('تم الحفظ'); }} />
+
+            {/* Smart Commission Field */}
+            <Text style={[styles.label, { fontSize: 14, marginBottom: 8 }]}>نسبة العمولة الجديدة</Text>
+            <View style={[styles.inputBox, { height: 56, borderWidth: 2, borderColor: colors.secondary, borderRadius: 16, backgroundColor: '#FFF', paddingHorizontal: 16, marginBottom: 8 }]}>
+               <Text style={{fontFamily: fonts.bold, fontSize: 18, color: colors.secondary, marginLeft: 8}}>%</Text>
+               <TextInput 
+                  style={[styles.input, { fontFamily: fonts.tajawalBold, fontSize: 24 }]} 
+                  value={newCommission} 
+                  onChangeText={setNewCommission}
+                  keyboardType="numeric" 
+               />
+            </View>
+            <Text style={{fontFamily: fonts.regular, fontSize: 12, color: colors.textSecondary, textAlign: 'right', marginBottom: 24}}>
+               العمولة الحالية: <Text style={{fontFamily: fonts.tajawalBold}}>{editTeacher?.commission}</Text> ⬅️ العمولة الجديدة: <Text style={{fontFamily: fonts.tajawalBold}}>{newCommission || 0}%</Text>
+            </Text>
+
+            {/* Permissions Toggle */}
+            <Text style={[styles.label, { fontSize: 14, marginBottom: 8 }]}>صلاحيات المعلم</Text>
+            <View style={{flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F9F9F9', padding: 16, borderRadius: 16, borderWidth: 2, borderColor: '#EEE', marginBottom: 24}}>
+               <Text style={{fontFamily: fonts.bold, fontSize: 14, color: colors.secondary}}>تجاوز مراجعة المحتوى (نشر تلقائي)</Text>
+               <Pressable 
+                  onPress={() => setAutoPublish(!autoPublish)} 
+                  style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: autoPublish ? colors.primary : '#E5E7EB', borderWidth: 2, borderColor: colors.secondary, justifyContent: 'center', paddingHorizontal: 2 }}
+               >
+                  <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: autoPublish ? colors.secondary : '#FFF', borderWidth: autoPublish ? 0 : 2, borderColor: colors.secondary, alignSelf: autoPublish ? 'flex-start' : 'flex-end' }} />
+               </Pressable>
+            </View>
+
+            {/* Impact Preview */}
+            <View style={{backgroundColor: '#F3F4F6', padding: 16, borderRadius: 16, marginBottom: 24}}>
+               <Text style={{fontFamily: fonts.regular, fontSize: 12, color: colors.textSecondary, textAlign: 'center', lineHeight: 20}}>
+                  💡 توضيح: لكل 1,000 ج.م مبيعات، سيكون صافي ربح السنتر {(1000 * (parseFloat(newCommission || '0') / 100)).toLocaleString('en-US')} ج.م
+               </Text>
+            </View>
+
+            {/* Action Buttons */}
+            <View style={{ flexDirection: 'row-reverse', gap: 16, marginTop: 8 }}>
+               <Button 
+                  label="حفظ التعديلات" 
+                  variant="primary" 
+                  style={{ flex: 2, height: 50, borderRadius: 24, borderWidth: 2, borderColor: colors.secondary, shadowColor: '#000', shadowOffset: { width: 4, height: 4 }, shadowOpacity: 1, shadowRadius: 0, elevation: 4 }} 
+                  onPress={() => { setEditTeacher(null); showToast('تم الحفظ وتحديث الصلاحيات'); }} 
+               />
+               <Button 
+                  label="إلغاء" 
+                  variant="secondary" 
+                  style={{ flex: 1, height: 50, borderRadius: 24, borderWidth: 2, borderColor: colors.secondary }} 
+                  onPress={() => setEditTeacher(null)} 
+               />
+            </View>
          </View>
       </Modal>
 
@@ -270,26 +366,40 @@ export const TeachersScreen: React.FC = () => {
                            <Text style={styles.statLabel}>إجمالي الكورسات</Text>
                            <Text style={styles.statVal}>{viewTeacher.courses}</Text>
                         </View>
-                        <View style={[styles.statItem, { borderRightWidth: 1, borderRightColor: colors.border }]}>
+                        <View style={{ width: 2, backgroundColor: colors.secondary, marginVertical: 8 }} />
+                        <View style={styles.statItem}>
                            <Text style={styles.statLabel}>التخصص</Text>
                            <Text style={styles.statVal}>{viewTeacher.specialty}</Text>
                         </View>
                      </View>
                   ) : (
-                     <View style={styles.statsCard}>
-                        <View style={styles.statItem}>
-                           <Text style={styles.statLabel}>إجمالي المبيعات</Text>
-                           <Text style={styles.statVal}>{viewTeacher.sales} ر.س</Text>
+                     <View>
+                        <View style={styles.statsCard}>
+                           <View style={styles.statItem}>
+                              <Text style={styles.statLabel}>إجمالي المبيعات</Text>
+                              <Text style={styles.statVal}>{viewTeacher.sales} ج.م</Text>
+                           </View>
+                           <View style={{ width: 2, backgroundColor: colors.secondary, marginVertical: 8 }} />
+                           <View style={styles.statItem}>
+                              <Text style={styles.statLabel}>العمولة الراهنة</Text>
+                              <Text style={styles.statVal}>{viewTeacher.commission}</Text>
+                           </View>
                         </View>
-                        <View style={[styles.statItem, { borderRightWidth: 1, borderRightColor: colors.border }]}>
-                           <Text style={styles.statLabel}>العمولة الراهنة</Text>
-                           <Text style={styles.statVal}>{viewTeacher.commission}</Text>
+                        <View style={styles.financeCardsRow}>
+                           <View style={[styles.financeMiniCard, { backgroundColor: colors.primaryLight, shadowColor: '#000', shadowOffset: { width: 2, height: 2 }, shadowOpacity: 1, shadowRadius: 0, elevation: 4 }]}>
+                              <Text style={styles.statLabel}>صافي ربح المؤسسة</Text>
+                              <Text style={styles.financeVal}>{centerCut.toLocaleString('en-US')} <Text style={{fontSize: 10}}>ج.م</Text></Text>
+                           </View>
+                           <View style={styles.financeMiniCard}>
+                              <Text style={styles.statLabel}>مستحقات المعلم</Text>
+                              <Text style={styles.financeVal}>{teacherCut.toLocaleString('en-US')} <Text style={{fontSize: 10}}>ج.م</Text></Text>
+                           </View>
                         </View>
                      </View>
                   )}
                </View>
 
-               <Button label="إغلاق" variant="secondary" onPress={() => setViewTeacher(null)} style={{marginTop: 24, borderRadius: radius.md}} />
+               <Button label="إغلاق" variant="secondary" onPress={() => setViewTeacher(null)} style={{marginTop: 24, borderWidth: 2, borderColor: colors.secondary, borderRadius: 24}} />
             </View>
          )}
       </Modal>
@@ -323,12 +433,12 @@ const styles = StyleSheet.create({
   filterText: { fontFamily: fonts.regular, fontSize: 13, textAlign: 'right' },
   tableCard: { flex: 1, backgroundColor: '#FFF', borderRadius: 24, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   tableHeader: { flexDirection: 'row-reverse', padding: 16, backgroundColor: '#FAFAFA', borderBottomWidth: 1, borderBottomColor: colors.border },
-  hCell: { flex: 1, fontFamily: fonts.bold, fontSize: 12, color: colors.textMuted, textAlign: 'right' },
-  row: { flexDirection: 'row-reverse', padding: 16, borderBottomWidth: 1, borderBottomColor: '#F0F0F0', alignItems: 'center' },
+  hCell: { flex: 1, fontFamily: fonts.bold, fontSize: 12, color: colors.textSecondary, textAlign: 'right' },
+  row: { flexDirection: 'row-reverse', padding: 16, borderBottomWidth: 1, borderBottomColor: colors.border, alignItems: 'center' },
   cell: { flex: 1, alignItems: 'flex-end' },
   avatar: { width: 40, height: 40, borderRadius: 10 },
   nameText: { fontFamily: fonts.bold, fontSize: 14, color: colors.secondary },
-  emailText: { fontFamily: fonts.regular, fontSize: 11, color: colors.textMuted },
+  emailText: { fontFamily: fonts.regular, fontSize: 11, color: colors.textMuted, marginTop: 4 },
   valText: { fontFamily: fonts.tajawalBold, fontSize: 15 },
   iconButton: { width: 32, height: 32, borderRadius: 8, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center' },
   modalBody: { paddingVertical: 10 },
@@ -344,17 +454,20 @@ const styles = StyleSheet.create({
   sideAvatar: { width: 70, height: 70, borderRadius: 15, marginBottom: 12 },
   sideName: { fontFamily: fonts.tajawalBold, fontSize: 18 },
   sideEmail: { fontFamily: fonts.regular, fontSize: 12, color: colors.textMuted },
-  sideTabs: { flexDirection: 'row-reverse', backgroundColor: '#F5F5F5', borderRadius: 10, padding: 4, marginBottom: 20, marginHorizontal: 15 },
-  sideTab: { flex: 1, paddingVertical: 8, alignItems: 'center' },
-  sideTabActive: { backgroundColor: '#FFF', borderRadius: 8, ...shadows.sm },
+  sideTabs: { flexDirection: 'row-reverse', backgroundColor: '#F3F4F6', borderRadius: 12, padding: 4, marginBottom: 20, marginHorizontal: 15 },
+  sideTab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
+  sideTabActive: { backgroundColor: '#FFF', borderWidth: 0, borderBottomWidth: 4, borderBottomColor: colors.primary },
   sideTabText: { fontFamily: fonts.bold, fontSize: 12 },
+  financeCardsRow: { flexDirection: 'row-reverse', gap: 16, marginTop: 16 },
+  financeMiniCard: { flex: 1, backgroundColor: '#FFF', borderWidth: 2, borderColor: colors.secondary, borderBottomWidth: 4, borderBottomColor: colors.secondary, borderRadius: 16, padding: 16, alignItems: 'center', justifyContent: 'center' },
+  financeVal: { fontFamily: fonts.tajawalBold, fontSize: 22, color: colors.secondary, marginTop: 4, textAlign: 'center' },
   toast: { position: 'absolute', bottom: 30, left: 30, backgroundColor: '#F0FDF4', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#10B981', flexDirection: 'row-reverse', alignItems: 'center', zIndex: 2000, ...shadows.md },
   toastText: { color: '#166534', fontFamily: fonts.bold, fontSize: 13, marginRight: 10 },
   statusDot: { width: 8, height: 8, borderRadius: 4, marginLeft: 6 },
-  profileModalBody: { paddingBottom: 10 },
-  tabContent: { marginTop: 10 },
-  statsCard: { flexDirection: 'row-reverse', backgroundColor: '#F8F9FA', borderRadius: 16, padding: 15, borderWidth: 1, borderColor: colors.border },
+  profileModalBody: { paddingBottom: 20, paddingHorizontal: 16 },
+  tabContent: { marginTop: 12 },
+  statsCard: { flexDirection: 'row-reverse', backgroundColor: '#FFF', borderRadius: 16, padding: 16, borderWidth: 2, borderColor: colors.secondary, borderBottomWidth: 4, borderBottomColor: colors.secondary },
   statItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  statLabel: { fontFamily: fonts.regular, fontSize: 11, color: colors.textMuted, marginBottom: 4 },
-  statVal: { fontFamily: fonts.tajawalBold, fontSize: 16, color: colors.secondary },
+  statLabel: { fontFamily: fonts.regular, fontSize: 10, color: colors.textMuted, marginBottom: 8, textAlign: 'center' },
+  statVal: { fontFamily: fonts.tajawalBold, fontSize: 20, color: colors.secondary, textAlign: 'center' },
 });

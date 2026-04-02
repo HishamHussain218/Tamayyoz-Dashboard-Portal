@@ -5,10 +5,10 @@ import { colors, fonts, radius, shadows, spacing } from '../../theme';
 import { Button } from '../ui/Button';
 
 const transactions = [
-  { id: '1', title: 'عمولة كورس الفيزياء', amount: '+ 450.00 ر.س', date: '٣١ مارس ٢٠٢٤', type: 'credit' },
-  { id: '2', title: 'تحويل بنكي للمدرس أ. محمد', amount: '- 1,200.00 ر.س', date: '٣٠ مارس ٢٠٢٤', type: 'debit' },
-  { id: '3', title: 'سحب مبيعات سنتر', amount: '- 5,000.00 ر.س', date: '٢٨ مارس ٢٠٢٤', type: 'debit' },
-  { id: '4', title: 'عمولة كورس البرمجة', amount: '+ 850.00 ر.س', date: '٢٧ مارس ٢٠٢٤', type: 'credit' },
+  { id: '1', title: 'عمولة كورس الفيزياء', amount: '+ 450.00 ج.م', date: '٣١ مارس ٢٠٢٤', type: 'credit' },
+  { id: '2', title: 'تحويل بنكي للمدرس أ. محمد', amount: '- 1,200.00 ج.م', date: '٣٠ مارس ٢٠٢٤', type: 'debit' },
+  { id: '3', title: 'سحب مبيعات سنتر', amount: '- 5,000.00 ج.م', date: '٢٨ مارس ٢٠٢٤', type: 'debit' },
+  { id: '4', title: 'عمولة كورس البرمجة', amount: '+ 850.00 ج.م', date: '٢٧ مارس ٢٠٢٤', type: 'credit' },
 ];
 
 export const FinanceScreen: React.FC = () => {
@@ -30,7 +30,7 @@ export const FinanceScreen: React.FC = () => {
       <View style={styles.statsGrid}>
          <View style={[styles.statBox, styles.balanceBox]}>
             <Text style={styles.balanceLabel}>الرصيد المتاح حالياً</Text>
-            <Text style={styles.balanceVal}>45,820.00 ر.س</Text>
+            <Text style={styles.balanceVal}>45,820.00 ج.م</Text>
             <TouchableOpacity style={styles.withdrawBtn}>
                <Text style={styles.withdrawText}>طلب سحب رصيد</Text>
             </TouchableOpacity>
@@ -43,7 +43,7 @@ export const FinanceScreen: React.FC = () => {
               </View>
               <View style={styles.miniTextGroup}>
                  <Text style={styles.miniLabel}>إجمالي الوارد</Text>
-                 <Text style={styles.miniVal}>120K ر.س</Text>
+                 <Text style={styles.miniVal}>120K ج.م</Text>
               </View>
            </View>
            <View style={styles.statMini}>
@@ -52,7 +52,7 @@ export const FinanceScreen: React.FC = () => {
               </View>
               <View style={styles.miniTextGroup}>
                  <Text style={styles.miniLabel}>إجمالي الصادر</Text>
-                 <Text style={styles.miniVal}>34K ر.س</Text>
+                 <Text style={styles.miniVal}>34K ج.م</Text>
               </View>
            </View>
          </View>

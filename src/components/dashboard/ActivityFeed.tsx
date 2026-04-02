@@ -34,12 +34,16 @@ export const ActivityFeed: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    backgroundColor: '#FFF',
+    borderRadius: 24,
     padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    ...shadows.sm,
+    borderWidth: 2,
+    borderColor: colors.secondary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 4,
   },
   title: {
     fontFamily: fonts.tajawalBold,

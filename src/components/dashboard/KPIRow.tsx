@@ -36,7 +36,7 @@ export const KPIRow: React.FC = () => (
   <View style={styles.grid}>
     <KPIItem
       title="صافي ربح السنتر المتوقع (عمولة %)"
-      value="104,250 ر.س"
+      value="104,250 ج.م"
       trend="+8%"
       icon={Percent}
       iconBg="#fff"
@@ -45,7 +45,7 @@ export const KPIRow: React.FC = () => (
     />
     <KPIItem
       title="إجمالي مبيعات السنتر الكلي"
-      value="346,800 ر.س"
+      value="346,800 ج.م"
       trend="+12%"
       icon={DollarSign}
       iconBg={colors.background}
@@ -75,15 +75,19 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    backgroundColor: '#FFF',
+    borderRadius: 24,
     padding: spacing.md,
-    borderWidth: 1.2,
-    borderColor: colors.borderLight,
-    ...shadows.sm,
+    borderWidth: 2,
+    borderColor: colors.secondary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 4,
   },
   cardHighlighted: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#FFFF00',
     borderColor: colors.secondary,
     borderWidth: 2,
   },

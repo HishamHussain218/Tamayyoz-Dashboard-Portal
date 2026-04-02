@@ -18,11 +18,11 @@ export const RevenueChart: React.FC = () => {
         <View style={styles.legend}>
            <View style={styles.legendItem}>
              <Text style={styles.legendText}>إجمالي المبيعات</Text>
-             <View style={[styles.legendBox, { backgroundColor: colors.border }]} />
+             <View style={[styles.legendBox, { backgroundColor: colors.borderLight }]} />
            </View>
            <View style={styles.legendItem}>
              <Text style={styles.legendText}>صافي الربح</Text>
-             <View style={[styles.legendBox, { backgroundColor: colors.primary }]} />
+             <View style={[styles.legendBox, { backgroundColor: '#FFFF00' }]} />
            </View>
         </View>
       </View>
@@ -35,8 +35,8 @@ export const RevenueChart: React.FC = () => {
           return (
             <View key={idx} style={styles.barGroup}>
               <View style={styles.barsContainer}>
-                <View style={[styles.bar, { height: salesH, backgroundColor: colors.border }]} />
-                <View style={[styles.bar, { height: profitH, backgroundColor: colors.primary, marginRight: -8 }]} />
+                <View style={[styles.bar, { height: salesH, backgroundColor: colors.borderLight }]} />
+                <View style={[styles.bar, { height: profitH, backgroundColor: '#FFFF00', marginRight: -8 }]} />
               </View>
               <Text style={styles.monthLabel}>{item.month}</Text>
             </View>
@@ -49,12 +49,16 @@ export const RevenueChart: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    backgroundColor: '#FFF',
+    borderRadius: 24,
     padding: spacing.xl,
-    borderWidth: 1.2,
-    borderColor: colors.borderLight,
-    ...shadows.sm,
+    borderWidth: 2,
+    borderColor: colors.secondary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 4,
   },
   header: {
     flexDirection: 'row-reverse',
@@ -87,9 +91,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   legendBox: {
-    width: 12,
-    height: 12,
-    borderRadius: 3,
+    width: 14,
+    height: 14,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: colors.secondary,
   },
   legendText: {
     fontFamily: fonts.semiBold,
@@ -116,9 +122,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bar: {
-    width: 16,
-    borderRadius: 4,
-    borderWidth: 1,
+    width: 20,
+    borderRadius: 8,
+    borderWidth: 2,
     borderColor: colors.secondary,
   },
   monthLabel: {

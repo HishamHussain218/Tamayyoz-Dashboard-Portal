@@ -65,7 +65,7 @@ interface MenuItem {
 const mainMenu: MenuItem[] = [
   { key: 'dashboard', label: 'مركز القيادة (الرئيسية)', icon: LayoutDashboard },
   { key: 'teachers', label: 'إدارة فريق العمل', icon: Users },
-  { key: 'approvals', label: 'طابور المراجعة', icon: ClipboardCheck, badge: 3 },
+  { key: 'approvals', label: 'مراجعة وتدقيق المحتوى', icon: ClipboardCheck, badge: 3 },
   { key: 'library', label: 'المكتبة المركزية', icon: Library },
   { key: 'finance', label: 'الماليات والعمولات', icon: Wallet },
   { key: 'students', label: 'إدارة الطلاب', icon: GraduationCap },

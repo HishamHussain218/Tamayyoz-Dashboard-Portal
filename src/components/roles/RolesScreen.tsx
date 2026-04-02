@@ -6,7 +6,7 @@ import { Button } from '../ui/Button';
 
 const roles = [
   { id: '1', title: 'سوبر أدمن (المالك)', users: 2, description: 'كافة الصلاحيات عبر النظام المالي والتعليمي', active: true },
-  { id: '2', title: 'مدير العمليات', users: 5, description: 'إدارة المعلمين، الموافقات، وطابور المراجعة', active: true },
+  { id: '2', title: 'مدير العمليات', users: 5, description: 'إدارة المعلمين، الموافقات، ومراجعة وتدقيق المحتوى', active: true },
   { id: '3', title: 'محاسب مالي', users: 1, description: 'عرض التقارير والعمولات فقط دون تعديل', active: true },
   { id: '4', title: 'دعم فني', users: 12, description: 'إدارة الطلاب وحل المشكلات البسيطة', active: true },
 ];

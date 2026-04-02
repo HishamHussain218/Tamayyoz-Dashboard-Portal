@@ -32,7 +32,7 @@ export const Leaderboard: React.FC = () => {
               </View>
             </View>
             <Text style={styles.sales}>
-              {(teacher.totalSales / 1000).toFixed(0)}K ر.س المبيعات
+              {(teacher.totalSales / 1000).toFixed(0)}K ج.م المبيعات
             </Text>
           </View>
           
@@ -47,12 +47,16 @@ export const Leaderboard: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    backgroundColor: '#FFF',
+    borderRadius: 24,
     padding: spacing.xl,
-    borderWidth: 1.2,
-    borderColor: colors.borderLight,
-    ...shadows.sm,
+    borderWidth: 2,
+    borderColor: colors.secondary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 4,
   },
   header: {
     flexDirection: 'row-reverse',
@@ -87,8 +91,8 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 18,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    borderWidth: 2,
+    borderColor: colors.secondary,
   },
   info: {
     flex: 1,
@@ -126,12 +130,17 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   actionBtn: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#FFFF00',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 12,
-    borderWidth: 1.2,
+    borderRadius: 24,
+    borderWidth: 2,
     borderColor: colors.secondary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 2,
   },
   btnText: {
     fontFamily: fonts.bold,

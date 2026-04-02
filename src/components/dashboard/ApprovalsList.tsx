@@ -15,7 +15,7 @@ export const ApprovalsList: React.FC = () => {
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <View style={styles.dot} />
-          <Text style={styles.title}>طابور المراجعة العاجل (٣ مهام بانتظارك)</Text>
+          <Text style={styles.title}>مراجعة وتدقيق المحتوى العاجل (٣ مهام بانتظارك)</Text>
         </View>
         <TouchableOpacity>
           <Text style={styles.viewMore}>عرض الكل</Text>
@@ -51,12 +51,16 @@ export const ApprovalsList: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    backgroundColor: '#FFF',
+    borderRadius: 24,
     padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    ...shadows.sm,
+    borderWidth: 2,
+    borderColor: colors.secondary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 4,
   },
   header: {
     flexDirection: 'row-reverse',
@@ -137,11 +141,16 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.2,
+    borderWidth: 2,
   },
   approveBtn: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#FFFF00',
     borderColor: colors.secondary,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 2,
   },
   approveBtnText: {
     fontFamily: fonts.bold,
@@ -150,7 +159,7 @@ const styles = StyleSheet.create({
   },
   reviewBtn: {
     backgroundColor: '#fff',
-    borderColor: colors.border,
+    borderColor: colors.secondary,
   },
   reviewBtnText: {
     fontFamily: fonts.bold,
