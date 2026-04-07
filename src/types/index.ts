@@ -85,4 +85,5 @@ export type TabKey =
   | 'library' 
   | 'finance' 
   | 'students' 
-  | 'roles';
+  | 'roles'
+  | 'support';

@@ -44,6 +44,7 @@ import { LibraryScreen } from '@/src/components/library/LibraryScreen';
 import { FinanceScreen } from '@/src/components/finance/FinanceScreen';
 import { StudentsScreen } from '@/src/components/students/StudentsScreen';
 import { RolesScreen } from '@/src/components/roles/RolesScreen';
+import { SupportScreen } from '@/src/components/support/SupportScreen';
 import { SearchBar } from '@/src/components/ui/SearchBar';
 import { LoginScreen } from '@/src/components/auth/LoginScreen';
 import { Button } from '@/src/components/ui/Button';
@@ -70,6 +71,7 @@ const mainMenu: MenuItem[] = [
   { key: 'finance', label: 'الماليات والعمولات', icon: Wallet },
   { key: 'students', label: 'إدارة الطلاب', icon: GraduationCap },
   { key: 'roles', label: 'الصلاحيات', icon: Shield },
+  { key: 'support', label: 'الدعم والمراسلات', icon: HelpCircle },
 ];
 
 const DashboardHome: React.FC = () => (
@@ -144,6 +146,7 @@ export default function App() {
       case 'finance': return <FinanceScreen />;
       case 'students': return <StudentsScreen />;
       case 'roles': return <RolesScreen />;
+      case 'support': return <SupportScreen />;
       default: return <DashboardHome />;
     }
   };
@@ -199,10 +202,6 @@ export default function App() {
 
           <View style={styles.sidebarFooter}>
             <View style={styles.footerLinks}>
-              <TouchableOpacity style={styles.footerItem}>
-                <HelpCircle size={20} color={colors.textSecondary} />
-                <Text style={styles.footerLabel}>الدعم الفني</Text>
-              </TouchableOpacity>
               <TouchableOpacity style={styles.footerItem}>
                 <Settings size={20} color={colors.textSecondary} />
                 <Text style={styles.footerLabel}>إعدادات الحساب</Text>
